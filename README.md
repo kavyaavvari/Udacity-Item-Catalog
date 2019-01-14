@@ -28,7 +28,7 @@ The following software should be installed in order to run the program.
 
 ## Getting Started
 
-1. Clone the ```https://github.com/kavyaavvari/Udacity-Item-Catalog.git``` 
+1. Clone the repository ```https://github.com/kavyaavvari/Udacity-Item-Catalog.git``` 
 2. cd into the ```vagrant``` directory, then cd into the ```catalog``` directory
 3. Run application with python ```application.py```
 4. Go to ```http://localhost:5000``` to access the application
