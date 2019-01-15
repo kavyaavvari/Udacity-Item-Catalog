@@ -172,13 +172,20 @@ def showCatalogItemDescription(category_id, catalog_item_id):
 
     if 'username' not in login_session:
         logged_in = False
+        current_user_id = 0
     else:
         logged_in = True
+        current_user = session.query(User)\
+            .filter_by(name=login_session['username']).one()
+        current_user_id = current_user.id
+    print('CURRENT USER ID')
+    print(current_user_id)
     return render_template('catalogitemdescription.html',
                            item=item,
                            selected_grocery=category,
                            groceries=extracted_categories,
-                           logged_in=logged_in)
+                           logged_in=logged_in,
+                           current_user_id=current_user_id)
 
 
 # CREATE - create catalog item
@@ -372,8 +379,8 @@ def gconnect():
     flash("you are now logged in as %s" % login_session['username'])
     print("done!")
 
-    username_list = session.query(User.name).all()
-    if login_session['username'] not in username_list:
+    if session.query(User).filter_by(name=login_session['username'])\
+            .scalar() is None:
         new_User = User(name=login_session['username'],
                         email=login_session['email'],
                         picture=login_session['picture'])
