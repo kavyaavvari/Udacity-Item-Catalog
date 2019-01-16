@@ -388,7 +388,8 @@ def gconnect():
         session.commit()
         login_session['user_id'] = new_User.id
     else:
-        curr_User = session.query(User).filter_by(name=login_session['username']).one()
+        curr_User = session.query(User)\
+            .filter_by(name=login_session['username']).one()
         login_session['user_id'] = curr_User.id
 
     return output
