@@ -19,7 +19,7 @@
             </div>
             <!--<button class="btn btn-primary navbar-btn btn-lg pull-right">Login</button>-->
             <div>
-               {% if logged_in %}
+              {% if session.user_id %}
                <a href="{{url_for('disconnect')}}" class="btn btn-primary navbar-btn btn-lg pull-right" role="button">Log Out</a>
                {% else %}
                <a href="{{url_for('showLogin')}}" class="btn btn-primary navbar-btn btn-lg pull-right" role="button">Log In</a>
@@ -50,7 +50,7 @@
               {% endblock %}
           </div>
           <div class="col-lg-8">
-              {% if logged_in %}
+              {% if session.user_id %}
                   {% block additem %}
                   {% endblock %}
               {% endif %}
@@ -58,7 +58,7 @@
               {% endblock %}
               {% block grocerycatalogitems %}
               {% endblock %}
-              {% if logged_in %}
+              {% if session.user_id %}
                   {% block edit_delete_CatalogItem %}
                   {% endblock %}
               {% endif %}

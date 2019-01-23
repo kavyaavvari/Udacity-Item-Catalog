@@ -37,6 +37,11 @@ session = scoped_session(sessionmaker(bind=engine))
 
 # Login required
 def must_login(f):
+    """
+    method name: must_login
+    Returns:
+        login to access certain parts of catalog
+    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'username' not in login_session:
@@ -45,14 +50,12 @@ def must_login(f):
     return decorated_function
 
 
-@app.route('/logged_in')
-def logged_in():
-    return render_template('logged_in.html')
-
-
 # form result
 @app.route('/result', methods=['POST', 'GET'])
 def result():
+    """
+    method name: result
+    """
     if request.method == 'POST':
         result = request.form
         item_name = result['item_name']
@@ -81,12 +84,22 @@ def result():
 # JSON APIs to view Catalog Information
 @app.route('/api/catalog/JSON')
 def catalogJSON():
+    """
+    method name: catalogJSON
+    Returns:
+        JSON of all items in the catalog
+    """
     items = session.query(CatalogItem).order_by(CatalogItem.name)
     return jsonify(CatalogItem=[i.serialize for i in items])
 
 
 @app.route('/api/categories/<int:category_id>/item/<int:catalog_item_id>/JSON')
 def catalogItemJSON(category_id, catalog_item_id):
+    """
+    method name: catalogItemJSON
+    Returns:
+        JSON of specific item(s) in catalog
+    """
     Catalog_items = session.query(CatalogItem)\
         .filter_by(id=catalog_item_id).one()
     return jsonify(Catalog_items=Catalog_items.serialize)
@@ -94,12 +107,22 @@ def catalogItemJSON(category_id, catalog_item_id):
 
 @app.route('/api/categories/JSON')
 def categoriesJSON():
+    """
+    method name: categoriesJSON
+    Returns:
+        JSON of all categories in the catalog
+    """
     categories = session.query(Category).all()
     return jsonify(allCategories=[r.serialize for r in categories])
 
 
 @app.route('/catalog.json')
 def catalog_detailed():
+    """
+    method name: catalog_detailed
+    Returns:
+        JSON of items along with their category in catalog
+    """
     categories = session.query(Category).all()
     sel_catalog_items = {}
     for idx, category_i in enumerate(categories):
@@ -120,6 +143,11 @@ def catalog_detailed():
 @app.route('/')
 @app.route('/categories')
 def showCatalog():
+    """
+    method name: showCatalog
+    Returns:
+        home catalog page with all of the categories and upto five latest items
+    """
     extracted_categories = session.query(Category).all()
     items = session.query(CatalogItem).order_by(asc(CatalogItem.name))
     latest_items = session.query(CatalogItem)\
@@ -127,16 +155,12 @@ def showCatalog():
     quantity = items.count()
 
     if 'username' not in login_session:
-        logged_in = False
         return render_template('public_catalog.html',
                                groceries=extracted_categories,
-                               logged_in=logged_in,
                                latest_items=latest_items)
     else:
-        logged_in = True
         return render_template('catalog.html',
                                groceries=extracted_categories,
-                               logged_in=logged_in,
                                latest_items=latest_items)
 
 
@@ -146,35 +170,36 @@ def showCatalog():
 @app.route('/categories/<int:category_id>/')
 @app.route('/categories/<int:category_id>/items/')
 def showCatalogItems(category_id):
+    """
+    method name: showCatalogItems
+    Returns:
+        all the items in the selected category
+    """
     extracted_categories = session.query(Category).all()
     category = session.query(Category).filter_by(id=category_id).one()
     items = session.query(CatalogItem).filter_by(category_id=category_id)\
         .order_by(CatalogItem.id.desc())
     quantity = items.count()
-    if 'username' not in login_session:
-        logged_in = False
-    else:
-        logged_in = True
     return render_template('showcatalogitems.html',
                            selected_grocery=category,
                            groceries=extracted_categories,
                            items=items,
-                           quantity=quantity,
-                           logged_in=logged_in)
+                           quantity=quantity)
 
 
 # READ ITEM - show description for that catalog item
 @app.route('/categories/<int:category_id>/item/<int:catalog_item_id>/')
 def showCatalogItemDescription(category_id, catalog_item_id):
+    """
+    method name: showCatalogItemDescription
+    Returns:
+        the item description for the selected item
+    """
     extracted_categories = session.query(Category).all()
     category = session.query(Category).filter_by(id=category_id).one()
     item = session.query(CatalogItem).filter_by(id=catalog_item_id).one()
 
-    if 'username' not in login_session:
-        logged_in = False
-        current_user_id = 0
-    else:
-        logged_in = True
+    if 'username' in login_session:
         current_user = session.query(User)\
             .filter_by(name=login_session['username']).one()
         current_user_id = current_user.id
@@ -184,7 +209,6 @@ def showCatalogItemDescription(category_id, catalog_item_id):
                            item=item,
                            selected_grocery=category,
                            groceries=extracted_categories,
-                           logged_in=logged_in,
                            current_user_id=current_user_id)
 
 
@@ -192,8 +216,12 @@ def showCatalogItemDescription(category_id, catalog_item_id):
 @app.route('/categories/item/new/', methods=['GET', 'POST'])
 @must_login
 def newCatalogItem():
+    """
+    method name: newCatalogItem
+    Returns:
+        a page for creating a new catalog item
+    """
     categories = session.query(Category).all()
-    logged_in = True
     if request.method == 'POST':
         newItem = CatalogItem(name=request.form['name'],
                               description=request.form['description'],
@@ -207,8 +235,7 @@ def newCatalogItem():
     else:
         return render_template('newcatalogitem.html',
                                categories=categories,
-                               modification=True,
-                               logged_in=logged_in)
+                               modification=True)
 
 
 # UPDATE - edit catalog item
@@ -216,11 +243,15 @@ def newCatalogItem():
            methods=['GET', 'POST'])
 @must_login
 def editCatalogItem(category_id, catalog_item_id):
+    """
+    method name: editCatalogItem
+    Returns:
+        a page for updating an existing catalog item
+    """
     categories = session.query(Category).all()
     category = session.query(Category).filter_by(id=category_id).one()
     editedItem = session.query(CatalogItem)\
         .filter_by(id=catalog_item_id).one_or_none()
-    logged_in = True
     if request.method == 'POST':
         if request.form['item_name']:
             editedItem.name = request.form['item_name']
@@ -249,19 +280,22 @@ def editCatalogItem(category_id, catalog_item_id):
                                categories=categories,
                                item=editedItem,
                                selected_grocery=category,
-                               modification=True,
-                               logged_in=logged_in)
+                               modification=True)
 
 
-# DELETE - remove a menu item
+# DELETE - remove a catalog item
 @app.route('/categories/<int:category_id>/item/<int:catalog_item_id>/delete',
            methods=['GET', 'POST'])
 @must_login
 def deleteCatalogItem(category_id, catalog_item_id):
+    """
+    method name: deleteCatalogItem
+    Returns:
+        a page to verify and delete the catalog item
+    """
     itemToDelete = session.query(CatalogItem)\
         .filter_by(id=catalog_item_id).one()
     category = session.query(Category).filter_by(id=category_id).one()
-    logged_in = True
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()
@@ -277,14 +311,18 @@ def deleteCatalogItem(category_id, catalog_item_id):
         return render_template('deletecatalogitem.html',
                                item=itemToDelete,
                                selected_grocery=category,
-                               modification=True,
-                               logged_in=logged_in)
+                               modification=True)
 
 
 # LOGIN
 # -----------------------------------------------
 @app.route('/login')
 def showLogin():
+    """
+    method name: showLogin
+    Returns:
+        a page with google oauth sign-in button
+    """
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in range(32))
     login_session['state'] = state
