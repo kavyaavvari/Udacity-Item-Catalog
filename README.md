@@ -59,11 +59,14 @@ A user can see(READ) all of the content on the website without logging in. Howev
 
 
 ### Required Software
-
-A step by step series of examples that tell you how to get a development env running
-
-```
-Give the example
-```
+The following software should be installed in order to run the program.
+* Python3
+* Vagrant
+* VirtualBox
 
 ### Getting Started
+1. Clone the repository ```https://github.com/kavyaavvari/Udacity-Item-Catalog.git``` 
+2. cd into the ```vagrant``` directory, then cd into the ```catalog``` directory
+3. Run application with python ```application.py```
+4. Go to ```http://localhost:5000``` to access the application
+5. Login to add a category and catalog item
