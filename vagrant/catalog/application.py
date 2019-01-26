@@ -299,8 +299,6 @@ def deleteCatalogItem(category_id, catalog_item_id):
     Returns:
         a page to verify and delete the catalog item
     """
-    if 'username' not in login_session:
-        return redirect('/login')
     itemToDelete = session.query(CatalogItem)\
         .filter_by(id=catalog_item_id).one()
     category = session.query(Category).filter_by(id=category_id).one()
