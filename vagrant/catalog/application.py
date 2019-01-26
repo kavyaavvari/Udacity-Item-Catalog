@@ -1,10 +1,18 @@
 from functools import wraps
-from flask import Flask, render_template, request
-from flask import redirect, url_for, flash, jsonify
+from flask import (
+Flask,
+render_template,
+request,
+redirect,
+url_for,
+flash,
+jsonify,
+session as login_session,
+make_response
+)
 from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker, scoped_session
 from database_setup import Base, User, CatalogItem, Category
-from flask import session as login_session
 from logging.config import dictConfig
 import random
 import string
@@ -13,7 +21,6 @@ from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
 import json
-from flask import make_response
 import requests
 
 
@@ -215,8 +222,6 @@ def newCatalogItem():
     Returns:
         a page for creating a new catalog item
     """
-    if 'username' not in login_session:
-        return redirect('/login')
 
     categories = session.query(Category).all()
     if request.method == 'POST':
