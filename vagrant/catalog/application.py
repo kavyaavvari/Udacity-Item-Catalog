@@ -233,7 +233,7 @@ def newCatalogItem():
         session.add(newItem)
         session.commit()
         flash('New %s Catalog Item Successfully Created' % (newItem.name))
-        return redirect(url_for('showMenu', restaurant_id=restaurant_id))
+        return redirect(url_for('showCatalog', restaurant_id=restaurant_id))
     else:
         return render_template('newcatalogitem.html',
                                categories=categories,
