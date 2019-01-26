@@ -5,6 +5,7 @@ from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker, scoped_session
 from database_setup import Base, User, CatalogItem, Category
 from flask import session as login_session
+from logging.config import dictConfig
 import random
 import string
 
@@ -199,17 +200,10 @@ def showCatalogItemDescription(category_id, catalog_item_id):
     category = session.query(Category).filter_by(id=category_id).one()
     item = session.query(CatalogItem).filter_by(id=catalog_item_id).one()
 
-    if 'username' in login_session:
-        current_user = session.query(User)\
-            .filter_by(name=login_session['username']).one()
-        current_user_id = current_user.id
-    print('CURRENT USER ID')
-    print(current_user_id)
     return render_template('catalogitemdescription.html',
                            item=item,
                            selected_grocery=category,
-                           groceries=extracted_categories,
-                           current_user_id=current_user_id)
+                           groceries=extracted_categories)
 
 
 # CREATE - create catalog item
@@ -221,6 +215,9 @@ def newCatalogItem():
     Returns:
         a page for creating a new catalog item
     """
+    if 'username' not in login_session:
+        return redirect('/login')
+
     categories = session.query(Category).all()
     if request.method == 'POST':
         newItem = CatalogItem(name=request.form['name'],
@@ -248,10 +245,19 @@ def editCatalogItem(category_id, catalog_item_id):
     Returns:
         a page for updating an existing catalog item
     """
+    if 'username' not in login_session:
+        return redirect('/login')
     categories = session.query(Category).all()
     category = session.query(Category).filter_by(id=category_id).one()
     editedItem = session.query(CatalogItem)\
         .filter_by(id=catalog_item_id).one_or_none()
+
+    if editedItem.user_id != login_session['user_id']:
+        return "<script>function myFunction() {alert('You are not authorized\
+        to edit this item. Please create your own item in order to edit.\
+        Redirecting to Home Page.');window.location = '/categories';}</script>\
+        <body onload='myFunction()'>"
+
     if request.method == 'POST':
         if request.form['item_name']:
             editedItem.name = request.form['item_name']
@@ -293,10 +299,22 @@ def deleteCatalogItem(category_id, catalog_item_id):
     Returns:
         a page to verify and delete the catalog item
     """
+    if 'username' not in login_session:
+        return redirect('/login')
     itemToDelete = session.query(CatalogItem)\
         .filter_by(id=catalog_item_id).one()
     category = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
+        if 'username' not in login_session:
+            return redirect('/login')
+
+        if itemToDelete.user_id != login_session['user_id']:
+            return "<script>function myFunction() {alert('You are not\
+            authorized to delete this item. Please create your own item\
+            in order to delete. Redirecting to Home Page.\
+            ');window.location = '/categories';}</script><body\
+            onload='myFunction()'>"
+
         session.delete(itemToDelete)
         session.commit()
         flash('Catalog Item Successfully Deleted')
