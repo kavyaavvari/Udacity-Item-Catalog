@@ -1,0 +1,16 @@
+{% extends "main.html" %}
+
+{% block categories %}
+Categories
+{% for groceryitem in groceries %}
+    <li class="category-link"><a href="{{url_for('showCatalogItems', category_id=groceryitem.id)}}"> {{groceryitem.name | title}} </a></li>
+{% endfor %}
+{% endblock %}
+
+{% block content %}
+Latest Items
+<br>
+{% for item_i in latest_items %}
+    <li class="category-link"><a href="{{url_for('showCatalogItemDescription', category_id = item_i.category_id, catalog_item_id = item_i.id)}}"> {{item_i.name | title}} </a></li>
+{% endfor %}
+{% endblock %}

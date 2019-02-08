@@ -1,0 +1,23 @@
+{% extends "main.html" %}
+
+{% block edit_delete_groceryitem %}
+<a href="{{url_for('showCatalogItemDescription', category_id = selected_grocery.id, catalog_item_id = item.id)}}" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-circle-arrow-left"></span>Back</a>
+<body>
+<div class="text-center">
+<h1> Are you sure you want to delete {{item.name}}?</h1>
+</div>
+
+<form action="{{url_for('deleteCatalogItem', category_id = selected_grocery.id, catalog_item_id = item.id)}}" method = 'POST'>
+
+<div class="text-center">
+  <button href="{{url_for('showCatalogItemDescription', category_id = selected_grocery.id, catalog_item_id = item.id)}}" class="btn btn-primary btn-lg" type="submit">Delete</button>
+</div>
+
+
+
+
+</form>
+
+</body>
+
+{% endblock %}

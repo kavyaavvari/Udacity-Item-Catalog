@@ -1,0 +1,36 @@
+{% extends "main.html" %}
+
+
+{% block categories %}
+Categories
+{% for groceryitem in groceries %}
+    <li class="category-link"><a href="{{url_for('showCatalogItems', category_id=groceryitem.id)}}"> {{groceryitem.name | title}} </a></li>
+{% endfor %}
+<br>
+<a href="{{url_for('showCatalogItems', category_id = selected_grocery.id)}}" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-circle-arrow-left"></span>Back</a>
+
+{% endblock %}
+
+
+{% block additem %}
+<a href="http://localhost:5000/categories/item/new/" class="btn btn-additem btn-info btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> Add Item</a>
+<br>
+{% endblock %}
+
+{% block grocerycatalogitems %}
+{{item.name | title}} ({{item.category.name | title}})
+<br>
+<h5>Price: ${{item.price}}</h5>
+<h5>Description: {{item.description}}</h5>
+
+{% endblock %}
+
+
+
+{% block edit_delete_CatalogItem %}
+{% if item.user_id == session.user_id %}
+<a class = "edit_delete_category_item" href="{{url_for('editCatalogItem', category_id = selected_grocery.id, catalog_item_id = item.id)}}">Edit</a>
+<a class = "just_a_bar">|</a>
+<a class = "edit_delete_category_item" href="{{url_for('deleteCatalogItem', category_id = selected_grocery.id, catalog_item_id = item.id)}}">Delete</a>
+{% endif %}
+{% endblock %}
